@@ -10,15 +10,11 @@ spring boot 应用发布到 docker 完整版
 二、安装并配置 Docker
 
     笔者用于测试的 linux 为 Centos，其他系统也差不太多。
-    1、安装 Docker
-		
-    直接使用 yum 安装即可：
-sudo yum install docker
-    安装完成后可以通过如下命令查看是否安装成功：
-docker version
+    1、安装 Docker            	
+    直接使用 yum 安装即可: sudo yum install docker
+    安装完成后可以通过如下命令查看是否安装成功：docker version
     如果正常输出版本等相关信息，即表示安装成功。
-    2、配置 Docker Remote API
-		
+    2、配置 Docker Remote API       		
     docker-maven-plugin 插件是使用的 Docker Remote API 进行远程提交镜像的，docker 默认并没有开启该选项，直接修改 docker 服务配置即可，
 Centos 7 配置文件位于：/usr/lib/systemd/system/docker.service
     直接在 ExecStart 启动参数的 /usr/bin/dockerd 后面添加以开启 TCP 连接：-H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock
