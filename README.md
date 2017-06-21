@@ -1,19 +1,24 @@
 spring boot 应用发布到 docker 完整版
+
 一、概述
+
     spring boot 和 docker 本身就不多介绍了，本文主要介绍使用 docker-maven-plugin 插件，直接将 spring boot 应用一键发布到 docker 容器中。
     文末会提供源码 Git 地址。
     笔者 docker 部署于一台 Centos 7.2 的云服务器，换做 VM 虚拟机的 Linux 也是一样的。
     用到的所涉及的软件版本皆为当前最新的，构建工具为 maven，如果使用的其他工具，请使用对应步骤替换。
  
 二、安装并配置 Docker
+
     笔者用于测试的 linux 为 Centos，其他系统也差不太多。
     1、安装 Docker
+		
     直接使用 yum 安装即可：
 sudo yum install docker
     安装完成后可以通过如下命令查看是否安装成功：
 docker version
     如果正常输出版本等相关信息，即表示安装成功。
     2、配置 Docker Remote API
+		
     docker-maven-plugin 插件是使用的 Docker Remote API 进行远程提交镜像的，docker 默认并没有开启该选项，直接修改 docker 服务配置即可，
 Centos 7 配置文件位于：/usr/lib/systemd/system/docker.service
     直接在 ExecStart 启动参数的 /usr/bin/dockerd 后面添加以开启 TCP 连接：-H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock
@@ -72,7 +77,9 @@ docker pull frolvlad/alpine-oraclejdk8
     通常不指定镜像版本，默认会 pull 当期镜像的 latest 版本。
  
 三、完成一个 Spring boot 应用并添加 docker-maven-plugin 插件
+
     1、完成 Spring boot 应用
+		
     Eclipse 可以安装 STS 插件，Idea 也自带 Spring Boot 工程一键生成工具，这里直接生成一个最简单的 Web 工程，并在启动代码中加入少许代码以对外提供一个简单的接口用于测试：
 package com.anxpp.demo;
 import org.springframework.boot.SpringApplication;
@@ -92,6 +99,7 @@ public class DockerApplication {
 }
     完成后可以运行并访问 http://localhost:8080 测试是否正常工作。
     2、添加 docker-maven-plugin 插件
+		
     插件最新版本为 0.4.13，此处还是贴完整的 pom 文件吧：
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -164,7 +172,9 @@ ENTRYPOINT [ "sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urando
     ADD 后面请按照实际情况填写自己 package 生成的 jar 文件名称。
  
 四、构建
+
     1、生成镜像
+		
     首先需要运行 maven 的 package 命令生成 jar 文件，直接运行 docker:build 会因为找不到 jar 文件而构建失败！
 mvn clean package
     现在的 IDE 也都会提供图形化工具，拖着鼠标点点点就行了。
@@ -174,6 +184,7 @@ mvn clean package
 docker images
     如果列表中有我们刚刚生成的镜像，那么表示以上步骤都是成功的（废话）。
     2、运行
+		
     镜像运行后就成为容器，使用如下命令运行启动刚刚生成的镜像：
 docker run -d -p 8080:8080 -t anxpp/docker
     -d 是让容器后台运行
@@ -186,6 +197,7 @@ docker ps
     那么，用 docker 构建、运行和发布一个 Spring Boot 应用到此源码结束，深藏功与名。
  
 五、多说几句
+
     Docker 文章参考：Docker基础教程及实践专栏
     Spring boot 应用源码 GitHub：https://github.com/anxpp/springboot-docker-demo.git
     有问题赶紧留言吧，趁我还记得...
